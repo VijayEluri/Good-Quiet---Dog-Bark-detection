@@ -17,7 +17,7 @@ boolean audioPlaying = false;
 boolean barkDetected = false;
 int barkCounter = 0;
 long barkTime;
-int waitTime = 3000;
+int waitTime = 4500;
 
 PFont font;
 
@@ -51,8 +51,12 @@ void draw()
   else {
     background(100,0,0);
   }
+  
+  
   stroke(255);
-  // draw the waveforms
+  
+  // audio detection stuff
+  
   sum = 0.0;
   for(int i = 0; i < in.bufferSize() - 1; i++)
   {
@@ -62,8 +66,10 @@ void draw()
   }
 
   currHigh = sum/in.bufferSize();
+  
+  
   if (currHigh > threshold && !audioFiles[currAudio].isPlaying() && (millis() - barkTime > 1000)) {
-
+    //set / reset barkTime
     barkDetected = true;
     barkTime = millis();
 
@@ -73,13 +79,14 @@ void draw()
     
   } 
   else if (barkDetected && !audioPlaying && !audioFiles[currAudio].isPlaying() && (millis() - barkTime > waitTime) ) {
+    //start audio if bark was detected a few seconds ago
     audioPlaying = true;
     audioFiles[currAudio].rewind();
     audioFiles[currAudio].play();
     println("playing audio file: " + currAudio);
   } 
   else if (barkDetected && audioPlaying && !audioFiles[currAudio].isPlaying()  ) {
-
+    //audio file is done playing, reset things and increment to next audio file
     resetAudio();
     println("ending audio");
     //increment audiotrack counter
