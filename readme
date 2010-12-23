@@ -1,5 +1,10 @@
 This is a program for my dog. When we leave the hosue and he is in his crate he barks. 
 
-This program will listen for an change in audio, a bark. It will wait for a defined amount of quiet time after the bark, 4 or 5 seconds perhaps and the play different mp3 files that are our voices to try and reward him for being quiet. I'm pretty sure this is cruel and he doens't like it but it kind of works.
+1) This program will listen for a change in audio, a bark. 
+2) It will wait for a defined amount of quiet time after the bark, 4 or 5 seconds perhaps and the play different mp3 files that are our voices to try and reward him for being quiet. 
+
+I'm pretty sure this is cruel and he doens't like it but it kind of works.
 
 You will need the latest version of Processing, avaialble at Processing.org. You can update the audio files inside the data folder and adjust the sketch's setup configuration. 
+
+There is also a bark counter than can tell you how often your dog is barking while you are away.
