@@ -6,18 +6,23 @@ import ddf.minim.effects.*;
 
 Minim minim;
 AudioInput in;
+
+//CHANGE THESE
 float  threshold = 1.5;
+int waitTime = 4500;
+
 float sum,avg,currHigh;
 
 AudioPlayer[] audioFiles = new AudioPlayer[3];
 int currAudio = 0;
 int audioCount = 3;
 boolean audioPlaying = false;
+int hour = 0; //hour var to be adjusted to 12 hour time
 
 boolean barkDetected = false;
 int barkCounter = 0;
 long barkTime;
-int waitTime = 4500;
+
 
 PFont font;
 
@@ -74,7 +79,12 @@ void draw()
     barkTime = millis();
 
     barkCounter++;
-    println("bark detected: " + barkCounter);
+    
+    hour = hour();
+    if (hour >12){ hour = hour -12;} //adjust hour to 12 hour time
+    
+    
+    println("bark detected: " + barkCounter + " time: "+ hour + ":" + minute()+ " second "+ second());
     
     
   } 
@@ -83,7 +93,10 @@ void draw()
     audioPlaying = true;
     audioFiles[currAudio].rewind();
     audioFiles[currAudio].play();
-    println("playing audio file: " + currAudio);
+    
+    hour = hour();
+    if (hour >12){ hour = hour -12;} //adjust hour to 12 hour time
+    println("playing audio file: " + currAudio + " time: "+ hour + ":" + minute()+ " second "+ second() );
   } 
   else if (barkDetected && audioPlaying && !audioFiles[currAudio].isPlaying()  ) {
     //audio file is done playing, reset things and increment to next audio file
@@ -122,4 +135,5 @@ void stop()
 
   super.stop();
 }
+
 
