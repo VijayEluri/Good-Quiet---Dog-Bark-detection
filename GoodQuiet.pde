@@ -6,39 +6,50 @@ import ddf.minim.effects.*;
 
 Minim minim;
 AudioInput in;
-float  threshold,sum,avg,currHigh;
+float  threshold = 1.5;
+float sum,avg,currHigh;
 
 AudioPlayer[] audioFiles = new AudioPlayer[3];
 int currAudio = 0;
 int audioCount = 3;
-boolean trackStarted = false;
+boolean audioPlaying = false;
+
+boolean barkDetected = false;
+int barkCounter = 0;
+long barkTime;
+int waitTime = 3000;
+
+PFont font;
 
 void setup()
 {
   size(256, 200, P3D);
- 
+
   minim = new Minim(this);
-  minim.debugOn();
- 
+  // minim.debugOn();
+
   // get a line in from Minim, default bit depth is 16
   in = minim.getLineIn(Minim.STEREO, 256);//
-  
+
   //audio files
-  
+
   audioFiles[0] = minim.loadFile("1.mp3", 2048);
   audioFiles[1] = minim.loadFile("2.mp3", 2048);
   audioFiles[2] = minim.loadFile("3.mp3", 2048);
 
-  threshold = 1.5;
+  font = loadFont("HelveticaNeue-Bold-100.vlw");
 }
- 
+
 void draw()
 {
-  if (audioFiles[currAudio].isPlaying()) {
+  if (barkDetected && audioFiles[currAudio].isPlaying() ) {
     background(0,100,0);
-  } else {
+  }  
+  else if (barkDetected && !audioFiles[currAudio].isPlaying() ) {
+    background(200,100,50);
+  } 
+  else {
     background(100,0,0);
-  
   }
   stroke(255);
   // draw the waveforms
@@ -51,34 +62,57 @@ void draw()
   }
 
   currHigh = sum/in.bufferSize();
-  if (currHigh > threshold && !audioFiles[currAudio].isPlaying()) {
-    audioFiles[currAudio].play();
-    trackStarted = true;
-  } else if (trackStarted &&  !audioFiles[currAudio].isPlaying() ) {
-    trackStarted = false;
-    audioFiles[currAudio].loop(1);
-    audioFiles[currAudio].pause();
+  if (currHigh > threshold && !audioFiles[currAudio].isPlaying() && (millis() - barkTime > 1000)) {
+
+    barkDetected = true;
+    barkTime = millis();
+
+    barkCounter++;
+    println("bark detected: " + barkCounter);
     
+    
+  } 
+  else if (barkDetected && !audioPlaying && !audioFiles[currAudio].isPlaying() && (millis() - barkTime > waitTime) ) {
+    audioPlaying = true;
+    audioFiles[currAudio].rewind();
+    audioFiles[currAudio].play();
+    println("playing audio file: " + currAudio);
+  } 
+  else if (barkDetected && audioPlaying && !audioFiles[currAudio].isPlaying()  ) {
+
+    resetAudio();
+    println("ending audio");
     //increment audiotrack counter
     if (currAudio < audioCount-1) {
       currAudio += 1;
-    } else {
-     currAudio = 0; 
+    } 
+    else {
+      currAudio = 0;
     }
   }
-  
-//  println(audioFiles[currAudio].isPlaying());
+
+  //display bark count
+  textFont(font); 
+  textAlign(CENTER);
+  int fWidth = (int)textWidth(Integer.toString(barkCounter));
+  text(barkCounter,(width/2), (height/2)+35);
 }
- 
- 
+
+void resetAudio() {
+  barkDetected = false;
+  audioPlaying = false;
+  audioFiles[currAudio].loop(1);
+  audioFiles[currAudio].pause();
+}
 void stop()
 {
   // always close Minim audio classes when you are done with them
   in.close();
   for(int i = 0; i<audioCount; i++) {
-   audioFiles[i].close(); 
+    audioFiles[i].close();
   }
   minim.stop();
-  
+
   super.stop();
 }
+
