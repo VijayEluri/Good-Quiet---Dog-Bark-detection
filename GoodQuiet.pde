@@ -3,6 +3,7 @@ import ddf.minim.signals.*;
 import ddf.minim.analysis.*;
 import ddf.minim.effects.*;
 
+PrintWriter output;
 
 Minim minim;
 AudioInput in;
@@ -43,6 +44,9 @@ void setup()
   audioFiles[2] = minim.loadFile("3.mp3", 2048);
 
   font = loadFont("HelveticaNeue-Bold-100.vlw");
+  
+   output = createWriter("barklog"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+".txt"); 
+
 }
 
 void draw()
@@ -85,7 +89,7 @@ void draw()
     
     
     println("bark detected: " + barkCounter + " time: "+ hour + ":" + minute()+ " second "+ second());
-    
+     output.println("\"bark\",\""+barkCounter+"\",\""+currHigh+"\",\""+hour + ":" + minute()+ ":"+ second()+"\""); // Write the coordinate to the file
     
   } 
   else if (barkDetected && !audioPlaying && !audioFiles[currAudio].isPlaying() && (millis() - barkTime > waitTime) ) {
@@ -97,11 +101,12 @@ void draw()
     hour = hour();
     if (hour >12){ hour = hour -12;} //adjust hour to 12 hour time
     println("playing audio file: " + currAudio + " time: "+ hour + ":" + minute()+ " second "+ second() );
+    output.println("\"audio\",\""+hour + ":" + minute()+ ":"+ second()+"\""); // Write the coordinate to the file
   } 
   else if (barkDetected && audioPlaying && !audioFiles[currAudio].isPlaying()  ) {
     //audio file is done playing, reset things and increment to next audio file
     resetAudio();
-    println("ending audio");
+    println("ending audio \nq");
     //increment audiotrack counter
     if (currAudio < audioCount-1) {
       currAudio += 1;
@@ -116,6 +121,8 @@ void draw()
   textAlign(CENTER);
   int fWidth = (int)textWidth(Integer.toString(barkCounter));
   text(barkCounter,(width/2), (height/2)+35);
+  
+  output.flush();
 }
 
 void resetAudio() {
