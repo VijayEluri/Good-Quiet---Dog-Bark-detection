@@ -24,9 +24,9 @@ boolean barkDetected = false;
 int barkCounter = 0;
 long barkTime;
 
-
 PFont font;
 
+// runs only once
 void setup()
 {
   size(256, 200, P3D);
@@ -37,18 +37,20 @@ void setup()
   // get a line in from Minim, default bit depth is 16
   in = minim.getLineIn(Minim.STEREO, 256);//
 
-  //audio files
-
+  // audio files
+  // adjust files as needed
   audioFiles[0] = minim.loadFile("1.mp3", 2048);
   audioFiles[1] = minim.loadFile("2.mp3", 2048);
   audioFiles[2] = minim.loadFile("3.mp3", 2048);
 
   font = loadFont("HelveticaNeue-Bold-100.vlw");
   
-   output = createWriter("barklog"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+".txt"); 
+  output = createWriter("barklog"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+".txt"); 
 
 }
 
+
+// runs continuously
 void draw()
 {
   if (barkDetected && audioFiles[currAudio].isPlaying() ) {
@@ -60,7 +62,6 @@ void draw()
   else {
     background(100,0,0);
   }
-  
   
   stroke(255);
   
